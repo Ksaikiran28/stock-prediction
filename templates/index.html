@@ -13,60 +13,93 @@
         .chart-container {
             margin-top: 30px;
         }
-        .table-responsive {
-            margin-top: 20px;
-        }
         .download-link {
             margin-top: 20px;
+        }
+        .spinner-border {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center">Stock Trend Prediction</h1>
-        <form method="POST">
+        <h1 class="text-center mb-4">📈 Stock Trend Prediction</h1>
+
+        {% if error %}
+        <div class="alert alert-danger mt-4" role="alert">
+            {{ error }}
+        </div>
+        {% endif %}
+        
+
+        <!-- Form -->
+        <form method="POST" onsubmit="showSpinner()">
             <div class="mb-3">
                 <label for="stock" class="form-label">Enter Stock Ticker:</label>
-                <input type="text" class="form-control" id="stock" name="stock" value="POWERGRID.NS">
+                <input type="text" class="form-control" id="stock" name="stock" placeholder="e.g., RELIANCE.NS" required>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
+            <div class="spinner-border text-primary ms-3" role="status" id="loadingSpinner">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </form>
-        
+
+        <!-- Charts -->
         {% if plot_path_ema_20_50 %}
-        <div class="chart-container">
-            <h3>Closing Price vs Time (20 & 50 Days EMA)</h3>
-            <img src="{{ url_for('static', filename='ema_20_50.png') }}" class="img-fluid" alt="EMA 20 & 50">
+        <div class="chart-container card mt-4">
+            <div class="card-body">
+                <h4 class="card-title">📊 EMA 20 & 50</h4>
+                <img src="{{ url_for('static', filename='ema_20_50.png') }}" class="img-fluid" alt="EMA 20 & 50" style="max-height: 500px; width: 100%; object-fit: contain;">
+            </div>
         </div>
         {% endif %}
-        
+
         {% if plot_path_ema_100_200 %}
-        <div class="chart-container">
-            <h3>Closing Price vs Time (100 & 200 Days EMA)</h3>
-            <img src="{{ url_for('static', filename='ema_100_200.png') }}" class="img-fluid" alt="EMA 100 & 200">
+        <div class="chart-container card mt-4">
+            <div class="card-body">
+                <h4 class="card-title">📊 EMA 100 & 200</h4>
+                <img src="{{ url_for('static', filename='ema_100_200.png') }}" class="img-fluid" alt="EMA 100 & 200" style="max-height: 500px; width: 100%; object-fit: contain;">
+            </div>
         </div>
         {% endif %}
-        
+
         {% if plot_path_prediction %}
-        <div class="chart-container">
-            <h3>Prediction vs Original Trend</h3>
-            <img src="{{ url_for('static', filename='stock_prediction.png') }}" class="img-fluid" alt="Prediction vs Original">
+        <div class="chart-container card mt-4">
+            <div class="card-body">
+                <h4 class="card-title">🔮 Prediction vs Original Trend</h4>
+                <img src="{{ url_for('static', filename='stock_prediction.png') }}" class="img-fluid" alt="Prediction vs Original" style="max-height: 500px; width: 100%; object-fit: contain;">
+            </div>
         </div>
         {% endif %}
-        
+
+        <!-- Descriptive Stats -->
         {% if data_desc %}
-        <div class="table-responsive">
-            <h3 class="mt-4">Descriptive Data from Jan 2000 to Nov 2024</h3>
-            {{ data_desc | safe }}
+        <div class="card mt-4">
+            <div class="card-body">
+                <h4 class="card-title">📑 Descriptive Statistics</h4>
+                <div class="table-responsive">
+                    {{ data_desc | safe }}
+                </div>
+            </div>
         </div>
         {% endif %}
-        
+
+        <!-- Download Link -->
         {% if dataset_link %}
-        <div class="download-link">
-            <a href="{{ url_for('download_file', filename=dataset_link.split('/')[-1]) }}" class="btn btn-success" download>Download Dataset (CSV)</a>
+        <div class="download-link text-center">
+            <a href="{{ url_for('download_file', filename=dataset_link.split('/')[-1]) }}" class="btn btn-success mt-4" download>
+                ⬇️ Download Dataset (CSV)
+            </a>
         </div>
         {% endif %}
     </div>
 
+    <!-- Bootstrap JS + Spinner JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showSpinner() {
+            document.getElementById('loadingSpinner').style.display = 'inline-block';
+        }
+    </script>
 </body>
 </html>
